@@ -1,0 +1,393 @@
+/* ================================================================
+   AdminCRM.scss – FULL CLEAN COMPACT VERSION (FIXED UI)
+================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ───────── ROOT ───────── */
+.acrm-root {
+  --white: #ffffff;
+  --bg: #f8fafc;
+  --bg2: #f1f5f9;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --txt: #1e293b;
+  --txt2: #475569;
+  --txt3: #94a3b8;
+  --acc: #4f6ef7;
+  --acc-bg: #eef2ff;
+  --acc-border: #c7d2fe;
+
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ───────── TOP BAR ───────── */
+.acrm-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.acrm-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--bg2);
+  padding: 4px;
+  border-radius: 10px;
+
+  button {
+    padding: 6px 18px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    color: var(--txt2);
+    background: transparent;
+
+    &.active {
+      background: var(--white);
+      color: var(--acc);
+    }
+  }
+}
+
+.acrm-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 8px;
+  min-width: 240px;
+
+  input {
+    border: none;
+    outline: none;
+    font-size: 13px;
+    width: 100%;
+  }
+}
+
+/* ───────── TABLE WRAPPER ───────── */
+.acrm-table-wrap {
+  flex: 1;
+  margin: 12px 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ───────── HEADER ───────── */
+.acrm-thead {
+  display: flex;
+  align-items: center;
+  height: 40px; /* FIXED */
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--txt3);
+  background: var(--bg2);
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ───────── BODY ───────── */
+.acrm-tbody {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ───────── ROW ───────── */
+.acrm-row {
+  display: flex;
+  align-items: center;
+  min-height: 44px; /* 🔥 MAIN FIX */
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  transition: 0.2s;
+}
+
+.acrm-row:hover {
+  background: #fafbff;
+}
+
+.acrm-row > div {
+  padding: 6px;
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ───────── NAME CELL ───────── */
+.cell-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .row-av {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: var(--acc);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .row-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .row-nm {
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+/* ───────── EMAIL ───────── */
+.cell-mono {
+  font-size: 12px;
+  color: var(--txt2);
+}
+
+/* ───────── BADGES ───────── */
+.lvl-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.lvl-high { background: #dcfce7; color: #166534; }
+.lvl-mid { background: #dbeafe; color: #1e40af; }
+.lvl-low { background: #f1f5f9; color: #475569; }
+
+/* ───────── TYPE TAG ───────── */
+.type-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.type-blue { background: #eff6ff; color: #1d4ed8; }
+.type-green { background: #f0fdf4; color: #166534; }
+.type-orange { background: #fff7ed; color: #c2410c; }
+.type-purple { background: #faf5ff; color: #6d28d9; }
+
+/* ───────── ACTIVITY BUTTON (FIXED) ───────── */
+.act-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--acc-border);
+  background: var(--acc-bg);
+  color: var(--acc);
+  cursor: pointer;
+}
+
+.act-btn:hover {
+  background: var(--acc);
+  color: white;
+}
+
+/* ───────── EMPTY ───────── */
+.acrm-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  font-size: 13px;
+  color: var(--txt3);
+}
+
+/* ================================================================
+   ACTIVITY POPUP – CLEAN + ALIGNED + PROFESSIONAL
+================================================================ */
+
+/* BACKDROP */
+.apop-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+/* POPUP BOX */
+.apop-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  max-height: 80vh;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  z-index: 1001;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* HEADER */
+.apop-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+
+  .apop-header-icon {
+    font-size: 20px;
+  }
+
+  .apop-header-text {
+    flex: 1;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+
+  .apop-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+  }
+}
+
+/* BODY */
+.apop-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+}
+
+/* SECTION */
+.apop-section {
+  margin-bottom: 18px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* SECTION HEADER (FIXED ALIGNMENT) */
+.apop-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  .apop-sec-bar {
+    width: 3px;
+    height: 16px;
+    background: #4f6ef7;
+    border-radius: 2px;
+  }
+
+  .apop-sec-icon {
+    font-size: 15px;
+  }
+
+  .apop-sec-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* 🔥 FIX: COUNT PROPERLY SPACED */
+  .apop-sec-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #eef2ff;
+    color: #4f6ef7;
+  }
+}
+
+/* CHIP ROW */
+.apop-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* CHIP */
+.apop-chip {
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* COLORS */
+.chip-blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.chip-purple {
+  background: #faf5ff;
+  color: #6d28d9;
+}
+
+.chip-teal {
+  background: #f0fdfa;
+  color: #0f766e;
+}
+
+/* EMPTY TEXT */
+.apop-none {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
