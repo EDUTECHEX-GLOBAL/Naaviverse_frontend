@@ -22,15 +22,14 @@ export default function Contact() {
   const formRef = useRef(null);
   const location = useLocation();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    // Scroll to contact form if URL contains #contact-form
-    if (location.hash === "#contact-form" && formRef.current) {
-      setTimeout(() => {
-        formRef.current.scrollIntoView({ behavior: "smooth" });
-      }, 100); // slight delay to ensure DOM is ready
-    }
-  }, [location]);
+useEffect(() => {
+  // Always scroll to contact form when page loads
+  if (formRef.current) {
+    setTimeout(() => {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200); // delay to ensure DOM is fully loaded
+  }
+}, [location]);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
