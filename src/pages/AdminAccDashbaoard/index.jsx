@@ -62,7 +62,7 @@ import AdminStepDataPage from "./AdminStepDataPage.jsx";
 import MyStepsAdmin from "./MyStepsAdmin/index.jsx";
 import MenuNav from "../../components/MenuNav/index.jsx";
 import EditServiceForm from "./EditServices";
-
+import Subscriptions from "./Subscriptions.jsx";
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -241,7 +241,7 @@ const AccDashboard = () => {
   } = useCoinContextData();
 
   const URL_TO_NAV = {
-    "/admin/dashboard/accountants": "Dashboard",
+    "/admin/dashboard/accountants": "Overview",
     "/admin/dashboard/crm": "CRM",
     "/admin/dashboard/paths": "Paths",
     "/admin/dashboard/steps": "Steps",
@@ -321,12 +321,12 @@ const AccDashboard = () => {
     setIsUniLoading(false);
   };
 
-  useEffect(() => {
-    axios.get(`https://careers.marketsverse.com/paths/get`).then((res) => {
-      let result = res?.data?.data;
-      setBackupPathList(result || []);
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get(`https://careers.marketsverse.com/paths/get`).then((res) => {
+  //     let result = res?.data?.data;
+  //     setBackupPathList(result || []);
+  //   });
+  // }, []);
 
   const addBackupPath = (backupPathId, selectedStepId) => {
     if (pathSteps?.the_ids) {
@@ -803,43 +803,43 @@ const AccDashboard = () => {
       .finally(() => setIsloading(false));
   };
 
-  const changeServiceIcon = () => {
-    setIsloading(true);
-    const obj = {
-      email: userDetails?.email,
-      token: userDetails?.idToken,
-      field_name: "product_icon",
-      field_value: updatedIcon,
-      product_id: selectedService?.product_id,
-    };
-    axios
-      .post(`https://comms.globalxchange.io/gxb/product/edit`, obj)
-      .then((response) => {
-        const result = response?.data;
-        if (result?.status) {
-          myTimeout();
-        }
-      })
-      .catch((error) => {
-        console.log(error, "error in changeServiceIcon");
-      })
-      .finally(() => setIsloading(false));
-  };
+  // const changeServiceIcon = () => {
+  //   setIsloading(true);
+  //   const obj = {
+  //     email: userDetails?.email,
+  //     token: userDetails?.idToken,
+  //     field_name: "product_icon",
+  //     field_value: updatedIcon,
+  //     product_id: selectedService?.product_id,
+  //   };
+  //   axios
+  //     .post(`https://comms.globalxchange.io/gxb/product/edit`, obj)
+  //     .then((response) => {
+  //       const result = response?.data;
+  //       if (result?.status) {
+  //         myTimeout();
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "error in changeServiceIcon");
+  //     })
+  //     .finally(() => setIsloading(false));
+  // };
 
-  const getAppsforUser = () => {
-    setIsfetching(true);
-    axios
-      .get("https://comms.globalxchange.io/gxb/apps/get")
-      .then((response) => {
-        const result = response?.data?.apps;
-        setUserCreatedApps(result || []);
-        setIsfetching(false);
-      })
-      .catch((error) => {
-        console.log(error, "getAppsforUser error");
-        setIsfetching(false);
-      });
-  };
+  // const getAppsforUser = () => {
+  //   setIsfetching(true);
+  //   axios
+  //     .get("https://comms.globalxchange.io/gxb/apps/get")
+  //     .then((response) => {
+  //       const result = response?.data?.apps;
+  //       setUserCreatedApps(result || []);
+  //       setIsfetching(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "getAppsforUser error");
+  //       setIsfetching(false);
+  //     });
+  // };
 
   useEffect(() => {
     if (pathSteps) {
@@ -859,7 +859,6 @@ const AccDashboard = () => {
     setLevels();
     setInputValues([]);
     setMultiplier([]);
-    getWithCompPlan();
     setservicesMenu("With CompPlan");
   }
 
@@ -933,30 +932,30 @@ const AccDashboard = () => {
     ));
   };
 
-  const getWithCompPlan = () => {
-    setGettingData(true);
-    const obj = {
-      product_creator: userDetails?.user?.email,
-    };
-    axios
-      .post(
-        `https://comms.globalxchange.io/gxb/product/price/with/fees/get`,
-        obj
-      )
-      .then((response) => {
-        const result = response?.data?.products;
-        setWithCompPlanData(result || []);
-        setGettingData(false);
-      })
-      .catch((error) => {
-        console.log(error, "error in getWithCompPlan");
-        setGettingData(false);
-      });
-  };
+  // const getWithCompPlan = () => {
+  //   setGettingData(true);
+  //   const obj = {
+  //     product_creator: userDetails?.user?.email,
+  //   };
+  //   axios
+  //     .post(
+  //       `https://comms.globalxchange.io/gxb/product/price/with/fees/get`,
+  //       obj
+  //     )
+  //     .then((response) => {
+  //       const result = response?.data?.products;
+  //       setWithCompPlanData(result || []);
+  //       setGettingData(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "error in getWithCompPlan");
+  //       setGettingData(false);
+  //     });
+  // };
 
-  useEffect(() => {
-    getWithCompPlan();
-  }, []);
+  // useEffect(() => {
+  //   getWithCompPlan();
+  // }, []);
 
   useEffect(() => {
     const email = userDetails?.email;
@@ -1054,52 +1053,52 @@ const AccDashboard = () => {
   };
 
   // get profile id
-  useEffect(() => {
-    const email = userDetails?.email;
-    if (coinAction?.includes("Add") && addActionStep === 1 && email) {
-      axios
-        .get(`https://comms.globalxchange.io/user/details/get?email=${email}`)
-        .then((res) => {
-          const { data } = res;
-          if (data?.status) {
-            setProfileId(data?.user?.["naavi_profile_id"] || "");
-          }
-        });
-    }
-  }, [coinAction, addActionStep, userDetails?.email]);
+  // useEffect(() => {
+  //   const email = userDetails?.email;
+  //   if (coinAction?.includes("Add") && addActionStep === 1 && email) {
+  //     axios
+  //       .get(`https://comms.globalxchange.io/user/details/get?email=${email}`)
+  //       .then((res) => {
+  //         const { data } = res;
+  //         if (data?.status) {
+  //           setProfileId(data?.user?.["naavi_profile_id"] || "");
+  //         }
+  //       });
+  //   }
+  // }, [coinAction, addActionStep, userDetails?.email]);
 
   // get payment methods for forex add action
-  useEffect(() => {
-    if (coinAction?.includes("Add") && selectedCoin?.coinSymbol) {
-      axios
-        .get(
-          `https://comms.globalxchange.io/coin/vault/service/payment/stats/get?select_type=fund&to_currency=${selectedCoin?.coinSymbol}&from_currency=${selectedCoin?.coinSymbol}&country=India&banker=shorupan@indianotc.com`
-        )
-        .then((response) => {
-          const result = response?.data?.pathData?.paymentMethod;
-          setPaymentMethodData(result || []);
-        })
-        .catch((error) => {
-          console.log(error, "error in fetching payment methods");
-        });
-    }
-  }, [coinAction, selectedCoin]);
+  // useEffect(() => {
+  //   if (coinAction?.includes("Add") && selectedCoin?.coinSymbol) {
+  //     axios
+  //       .get(
+  //         `https://comms.globalxchange.io/coin/vault/service/payment/stats/get?select_type=fund&to_currency=${selectedCoin?.coinSymbol}&from_currency=${selectedCoin?.coinSymbol}&country=India&banker=shorupan@indianotc.com`
+  //       )
+  //       .then((response) => {
+  //         const result = response?.data?.pathData?.paymentMethod;
+  //         setPaymentMethodData(result || []);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error, "error in fetching payment methods");
+  //       });
+  //   }
+  // }, [coinAction, selectedCoin]);
 
-  const getPathId = () => {
-    axios
-      .get(
-        `https://comms.globalxchange.io/coin/vault/service/payment/paths/get?from_currency=${selectedCoin?.coinSymbol}&to_currency=${selectedCoin?.coinSymbol}&select_type=fund&banker=shorupan@indianotc.com&paymentMethod=${selectedPaymentMethod}`
-      )
-      .then((response) => {
-        const result = response?.data?.paths;
-        if (result?.length > 0) {
-          setForexPathId(result[0]?.path_id);
-        }
-      })
-      .catch((error) => {
-        console.log(error, "error in getPathId");
-      });
-  };
+  // const getPathId = () => {
+  //   axios
+  //     .get(
+  //       `https://comms.globalxchange.io/coin/vault/service/payment/paths/get?from_currency=${selectedCoin?.coinSymbol}&to_currency=${selectedCoin?.coinSymbol}&select_type=fund&banker=shorupan@indianotc.com&paymentMethod=${selectedPaymentMethod}`
+  //     )
+  //     .then((response) => {
+  //       const result = response?.data?.paths;
+  //       if (result?.length > 0) {
+  //         setForexPathId(result[0]?.path_id);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "error in getPathId");
+  //     });
+  // };
 
   const onBlur = (e) => {
     const float = parseFloat(e.target.value);
@@ -1191,7 +1190,8 @@ const AccDashboard = () => {
             onClick={() => resetpop()}
             style={{
               height: "100vh",
-              overflow: "hidden",
+              overflow: "auto",
+              flex : 1,
               maxWidth: "calc(100vw - 220px)",
               width: "calc(100% - 20px)",
             }}
@@ -1206,11 +1206,14 @@ const AccDashboard = () => {
                       FIX 1: Added this block — was missing entirely.
                       FIX 2: "Dashboard" added to the known nav list below
                       so it never hits the "Coming Soon" fallback.          */}
-                  {accsideNav === "Dashboard" && (
-                    <Dashboard />
-                  )}
+                 {(accsideNav === "Dashboard" || accsideNav === "Overview") && <Dashboard />}
 
                   {accsideNav === "CRM" && <AdminCRM />}
+
+
+                  {accsideNav === "Subscriptions" && (
+  <Subscriptions />
+)}
 
                   {/* MARKETPLACE SECTION */}
                   {accsideNav === "Marketplace" && (
@@ -1296,8 +1299,10 @@ const AccDashboard = () => {
                       FIX: Added "Dashboard" to this list so it never shows
                       "Coming Soon" when the default nav loads on first visit  */}
                   {![
-                    "Dashboard",   // ← THIS WAS MISSING — caused "Coming Soon" on load
+                    "Dashboard",
+                    "Overview",   // ← THIS WAS MISSING — caused "Coming Soon" on load
                     "CRM",
+                    "Subscriptions",
                     "Marketplace",
                     "Calendar",
                     "Wallet",

@@ -34,10 +34,13 @@ import logo from "../../assets/images/logo/naavi_final_logo2.png";
 import CreateNewPath from './CreateNewPath';
 import CreateNewService from './CreateNewService';
 import "./CreateNewPath.scss";
+import PartnerHome from "./partnerHome";
+import CRMPage from './partnercrm';
+import MenuNav from "../../components/MenuNav/index.jsx";
 import {
   GetFollowersPerAccount,
   GetCategoriesAcc,
-  GetAllCustomerLicenses,
+  etAllCustomerLicenses,
   GetLogServices,
   GetAllCurrencies,
   CreatePopularService,
@@ -61,7 +64,7 @@ import VaultTransactions from "../VaultTransactions/index.jsx";
 import { Country, State, City } from 'country-state-city';
 import TransactionPage from "../dashboard/TransactionPage/index.jsx";
 import PurchasePage from "./PurchasePage/index.jsx";
-import MenuNav from "../../components/MenuNav/index.jsx";
+import MenGuNav from "../../components/MenuNav/index.jsx";
 import MyStepsAcc from "./MyStepsAcc/index.jsx";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -430,13 +433,13 @@ const AccDashboard = () => {
     // }
   };
 
-  useEffect(() => {
-    axios.get(`https://careers.marketsverse.com/paths/get`).then((res) => {
-      let result = res?.data?.data;
-      // console.log(result, "all paths fetched");
-      setBackupPathList(result);
-    });
-  }, []);
+  // useEffect(() => {
+  //   axios.get(`https://careers.marketsverse.com/paths/get`).then((res) => {
+  //     let result = res?.data?.data;
+  //     // console.log(result, "all paths fetched");
+  //     setBackupPathList(result);
+  //   });
+  // }, []);
 
   const addBackupPath = (backupPathId, selectedStepId) => {
     // console.log(pathSteps, "kjedkjweld");
@@ -1180,20 +1183,20 @@ const AccDashboard = () => {
       });
   };
 
-  const getAppsforUser = () => {
-    setIsfetching(true);
-    axios
-      .get("https://comms.globalxchange.io/gxb/apps/get")
-      .then((response) => {
-        let result = response?.data?.apps;
-        // console.log(result, 'getAppsforUser result');
-        setUserCreatedApps(result);
-        setIsfetching(false);
-      })
-      .catch((error) => {
-        console.log(error, "getAppsforUser error");
-      });
-  };
+  // const getAppsforUser = () => {
+  //   setIsfetching(true);
+  //   axios
+  //     .get("https://comms.globalxchange.io/gxb/apps/get")
+  //     .then((response) => {
+  //       let result = response?.data?.apps;
+  //       // console.log(result, 'getAppsforUser result');
+  //       setUserCreatedApps(result);
+  //       setIsfetching(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "getAppsforUser error");
+  //     });
+  // };
 
   const handleSavePath = () => {
     console.log("📨 FINAL PATH STEPS SUBMITTED:", pathSteps);
@@ -1212,7 +1215,6 @@ const AccDashboard = () => {
     setLevels();
     setInputValues([]);
     setMultiplier([]);
-    getWithCompPlan();
     setservicesMenu("With CompPlan");
   }
 
@@ -1307,29 +1309,29 @@ const AccDashboard = () => {
     ));
   };
 
-  const getWithCompPlan = () => {
-    setGettingData(true);
-    let obj = {
-      product_creator: userDetails?.email,
-    };
-    axios
-      .post(
-        `https://comms.globalxchange.io/gxb/product/price/with/fees/get`,
-        obj
-      )
-      .then((response) => {
-        let result = response?.data?.products;
-        setWithCompPlanData(result);
-        setGettingData(false);
-      })
-      .catch((error) => {
-        console.log(error, "error in getWithCompPlan");
-      });
-  };
+  // const getWithCompPlan = () => {
+  //   setGettingData(true);
+  //   let obj = {
+  //     product_creator: userDetails?.email,
+  //   };
+  //   axios
+  //     .post(
+  //       `https://comms.globalxchange.io/gxb/product/price/with/fees/get`,
+  //       obj
+  //     )
+  //     .then((response) => {
+  //       let result = response?.data?.products;
+  //       setWithCompPlanData(result);
+  //       setGettingData(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "error in getWithCompPlan");
+  //     });
+  // };
 
-  useEffect(() => {
-    getWithCompPlan();
-  }, []);
+  // useEffect(() => {
+  //   getWithCompPlan();
+  // }, []);
 
   const getCounsellorEmail = () => {
     const local = JSON.parse(localStorage.getItem("partner"));
@@ -1503,22 +1505,23 @@ const AccDashboard = () => {
     });
   };
 
-  useEffect(() => {
-    const email = getCounsellorEmail();
-    if (!email) return;
+useEffect(() => {
+  const email = getCounsellorEmail();
+  if (!email) return;
 
-    setClientLoading(true);
+  setClientLoading(true);   // ← sets isClientLoading to true
 
-    axios.get(`${BASE_URL}/api/crm/clients?creatoremail=${email}`)
-      .then(res => {
-        setCrmClientData(res.data?.data || []);
-        setClientLoading(false);
-      })
-      .catch(err => {
-        console.log("CRM CLIENT ERROR:", err);
-        setClientLoading(false);
-      });
-  }, []);
+  axios.get(`${BASE_URL}/api/crm/clients?creatoremail=${email}`)
+    .then(res => {
+      console.log("CRM DATA:", res.data);   // ← add this to confirm data shape
+      setCrmClientData(res.data?.data || []);
+      setClientLoading(false);
+    })
+    .catch(err => {
+      console.log("CRM CLIENT ERROR:", err);
+      setClientLoading(false);
+    });
+}, []);
 
   function customDateFormat(date) {
     if (date instanceof Date && !isNaN(date.valueOf())) {
@@ -1550,21 +1553,21 @@ const AccDashboard = () => {
     setForexQuote([]);
   };
 
-  // get profile id
-  useEffect(() => {
-    let email = userDetails?.email;
-    if (coinAction?.includes("Add") && addActionStep === 1) {
-      axios
-        .get(`https://comms.globalxchange.io/user/details/get?email=${email}`)
-        .then((res) => {
-          const { data } = res;
-          if (data?.status) {
-            // console.log(data?.user["naavi_profile_id"], "profile id");
-            setProfileId(data?.user["naavi_profile_id"]);
-          }
-        });
-    }
-  }, [coinAction, addActionStep]);
+  // // get profile id
+  // useEffect(() => {
+  //   let email = userDetails?.email;
+  //   if (coinAction?.includes("Add") && addActionStep === 1) {
+  //     axios
+  //       .get(`https://comms.globalxchange.io/user/details/get?email=${email}`)
+  //       .then((res) => {
+  //         const { data } = res;
+  //         if (data?.status) {
+  //           // console.log(data?.user["naavi_profile_id"], "profile id");
+  //           setProfileId(data?.user["naavi_profile_id"]);
+  //         }
+  //       });
+  //   }
+  // }, [coinAction, addActionStep]);
 
   // get payment methods for forex add action
   useEffect(() => {
@@ -1584,28 +1587,28 @@ const AccDashboard = () => {
     }
   }, [coinAction, selectedCoin]);
 
-  const getPathId = () => {
-    axios
-      .get(
-        `https://comms.globalxchange.io/coin/vault/service/payment/paths/get?from_currency=${selectedCoin?.coinSymbol}&to_currency=${selectedCoin?.coinSymbol}&select_type=fund&banker=shorupan@indianotc.com&paymentMethod=${selectedPaymentMethod}`
-      )
-      .then((response) => {
-        let result = response?.data?.paths;
-        // console.log(result, "getPathId result");
-        if (result?.length > 0) {
-          setForexPathId(result[0]?.path_id);
-          // console.log(result[0]?.path_id, "pathId");
-        }
-      })
-      .catch((error) => {
-        console.log(error, "error in getPathId");
-      });
-  };
+  // const getPathId = () => {
+  //   axios
+  //     .get(
+  //       `https://comms.globalxchange.io/coin/vault/service/payment/paths/get?from_currency=${selectedCoin?.coinSymbol}&to_currency=${selectedCoin?.coinSymbol}&select_type=fund&banker=shorupan@indianotc.com&paymentMethod=${selectedPaymentMethod}`
+  //     )
+  //     .then((response) => {
+  //       let result = response?.data?.paths;
+  //       // console.log(result, "getPathId result");
+  //       if (result?.length > 0) {
+  //         setForexPathId(result[0]?.path_id);
+  //         // console.log(result[0]?.path_id, "pathId");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log(error, "error in getPathId");
+  //     });
+  // };
 
-  const onBlur = (e) => {
-    const float = parseFloat(e.target.value);
-    setAddForexAmount(float.toFixed(2));
-  };
+  // const onBlur = (e) => {
+  //   const float = parseFloat(e.target.value);
+  //   setAddForexAmount(float.toFixed(2));
+  // };
   const getQuote = () => {
     const partner = getPartner();
     const partnerEmailLocal = partner?.email || partner?.user?.email;
@@ -1847,33 +1850,23 @@ const AccDashboard = () => {
                   width: "100%",
                   overflow: "hidden"
                 }}>
-                  <div style={{
-                    padding: "0 35px",
-                    height: "60px",
-                    display: "flex",
-                    alignItems: "center",
-                    borderBottom: "0.5px solid #E5E5E5",
-                    flexShrink: 0,
-                    backgroundColor: "#ffffff"
-                  }}>
-                    <div style={{
-                      padding: "10px 30px",
-                      borderRadius: "35px",
-                      fontWeight: "700",
-                      fontSize: "15px",
-                      color: "#1f304f",
-                      background: "rgba(241, 241, 241, 0.5)"
-                    }}>
-                      Create New Path
-                    </div>
-                  </div>
-                  <div style={{
-                    flex: 1,
-                    minHeight: 0,
-                    overflowY: "auto",
-                    padding: "0",
-                    backgroundColor: "#ffffff"
-                  }}>
+                <div style={{
+  padding: "0 35px",
+  height: "60px",
+  display: "flex",
+  alignItems: "center",
+  flexShrink: 0,
+  backgroundColor: "#e8edf2"   // matches page canvas bg
+}}>
+  
+</div>
+<div style={{
+  flex: 1,
+  minHeight: 0,
+  overflowY: "auto",
+  padding: "0",
+  backgroundColor: "#e8edf2"  // matches page canvas bg
+}}>
                     <CreateNewPath
                       setpstep={setpstep}
                       setaccsideNav={setaccsideNav}
@@ -2001,203 +1994,33 @@ const AccDashboard = () => {
                     />
                   </div>
                 </div>
-              ) : accsideNav === "CRM" ? (
-                <>
-                  <MenuNav
-                    showDrop={showDrop}
-                    setShowDrop={setShowDrop}
-                    searchTerm={search}
-                    setSearchterm={setSearch}
-                    searchPlaceholder={crmMenu === "Followers"
-                      ? "Search Followers.."
-                      : crmMenu === "Purchases"
-                        ? "Search Purchases.."
-                        : crmMenu === "Users"
-                          ? "Search Users.."
-                          : "Search Clients..."}
-                  />
-                  <div className="crm-main" onClick={() => setShowDrop(false)}>
-                    <div className="crm-all-menu" style={{ padding: "12px 35px" }}>
-
-                      {/* ── Clients Tab ── */}
-                      <div
-                        className="crm-each-menu"
-                        style={{
-                          marginLeft: "0px",
-                          background: crmMenu === "Clients" ? "rgba(241, 241, 241, 0.5)" : "",
-                          fontWeight: crmMenu === "Clients" ? "700" : "",
-                        }}
-                        onClick={() => {
-                          setcrmMenu("Clients");
-                          setSearch("");
-                          navigate("/dashboard/accountants/crm?tab=clients");
-                        }}
-                      >
-                        Clients ({crmClientData?.length})
-                      </div>
-
-                      {/* ── Purchases Tab ── */}
-                      <div
-                        className="crm-each-menu"
-                        style={{
-                          background: crmMenu === "Purchases" ? "rgba(241,241,241,0.5)" : "",
-                          fontWeight: crmMenu === "Purchases" ? "700" : "",
-                        }}
-                        onClick={() => {
-                          setcrmMenu("Purchases");
-                          setSearch("");
-                          navigate("/dashboard/accountants/crm?tab=purchases");
-                        }}
-                      >
-                        Purchases ({crmPurchaseData.length})
-                      </div>
-
-                    </div>
-                    <div className="crm-all-box">
-                      {crmMenu === "Followers" ? (
-                        <>
-                          <div className="crm-follow-tab" style={{ padding: "10px 35px" }}>
-                            <div className="crm-follow-col1">Name</div>
-                            <div className="crm-follow-col2">Following Since</div>
-                          </div>
-                          <>
-                            {followData.length > 0 && !isLoading ? (
-                              <div className="follow-data-main">
-                                {followData
-                                  .filter((element) => element.userEmail.toLowerCase().startsWith(search.toLowerCase()))
-                                  .map((each, i) => (
-                                    <div
-                                      className="follower-box"
-                                      style={{
-                                        background: selectedFollower === each ? "rgba(241, 241, 241, 0.5)" : "",
-                                        padding: "22px 35px",
-                                        width: "100%",
-                                      }}
-                                      onClick={() => setSelectedFollower(each)}
-                                    >
-                                      <div className="follower-details">
-                                        <div><img className="user-icon" src={each.profile_img} alt="" /></div>
-                                        <div>
-                                          <div className="follower-mail">{each.username}</div>
-                                          <div className="follower-name" style={{ textTransform: "lowercase" }}>{each.userEmail}</div>
-                                        </div>
-                                      </div>
-                                      <div className="follow-time">{formatDate(each.timeStamp)}</div>
-                                    </div>
-                                  ))}
-                              </div>
-                            ) : isLoading ? (
-                              <div className="follow-data-main">
-                                {[1, 2, 3, 4, 5, 6].map((each, index) => (
-                                  <div key={index} className="follower-box">
-                                    <div className="follower-details">
-                                      <div><Skeleton className="user-icon" /></div>
-                                      <Skeleton className="follower-mail" style={{ width: "200px" }} />
-                                    </div>
-                                    <Skeleton className="follow-time" style={{ width: "150px" }} />
-                                  </div>
-                                ))}
-                              </div>
-                            ) : ""}
-                          </>
-                        </>
-                      ) : crmMenu === "Purchases" ? (
-                        <PurchasePage purchaseData={crmPurchaseData} search={search} />
-                      ) : crmMenu === "Clients" ? (
-                        <>
-                          <div className="crm-tab" style={{ padding: "10px 35px" }}>
-                            <div className="crm-each-col" style={{ margin: "0", width: "25%" }}>Name</div>
-                            <div className="crm-each-col" style={{ margin: "0", width: "30%", paddingLeft: "1rem" }}>Email</div>
-                            <div className="crm-each-col" style={{ margin: "0", width: "20%", paddingLeft: "1rem" }}>Phone</div>
-                            <div className="crm-each-col" style={{ margin: "0", width: "15%", paddingLeft: "1rem" }}>Country</div>
-                            <div className="crm-each-col" style={{ margin: "0", width: "10%", paddingLeft: "1rem" }}>Purchases</div>
-                          </div>
-                          <div className="clients-alldata">
-                            {isClientLoading
-                              ? Array(10).fill("").map((e, i) => (
-                                <div className="each-clientData" key={i}>
-                                  <div className="each-client-name"><Skeleton width={125} height={30} /></div>
-                                  <div className="each-client-email"><Skeleton width={150} height={30} /></div>
-                                  <div className="each-client-email"><Skeleton width={100} height={30} /></div>
-                                  <div className="each-client-email"><Skeleton width={75} height={30} /></div>
-                                  <div className="each-client-email"><Skeleton width={50} height={30} /></div>
-                                </div>
-                              ))
-                              : crmClientData
-                                ?.filter((item) =>
-                                  item.name.toLowerCase().startsWith(search.toLowerCase()) ||
-                                  item.email.toLowerCase().startsWith(search.toLowerCase())
-                                )
-                                ?.map((e, i) => (
-                                  <div className="each-clientData" key={i}>
-                                    <div className="each-client-name" style={{ width: "25%" }}>{e?.name}</div>
-                                    <div className="each-client-email" style={{ width: "30%" }}>{e?.email}</div>
-                                    <div className="each-client-email" style={{ width: "20%" }}>{e?.phoneNumber}</div>
-                                    <div className="each-client-email" style={{ width: "15%" }}>{e?.country}</div>
-                                    <div className="each-client-email" style={{ width: "10%" }}>{e?.purchaseDetails?.length}</div>
-                                  </div>
-                                ))}
-                          </div>
-                        </>
-                      ) : crmMenu === "Users" ? (
-                        <>
-                          <div className="crm-tab" style={{ padding: "10px 35px" }}>
-                            <div className="crm-each-col" style={{ textAlign: "left", margin: "0", width: "15%" }}>Name</div>
-                            <div className="crm-each-col" style={{ textAlign: "left", margin: "0", width: "20%", paddingLeft: "1rem" }}>Email</div>
-                            <div className="crm-each-col" style={{ textAlign: "left", margin: "0", width: "15%", paddingLeft: "1rem" }}>User Since</div>
-                            <div className="crm-each-col" style={{ textAlign: "left", margin: "0", width: "25%", paddingLeft: "1rem" }}>Affiliate</div>
-                            <div className="crm-each-col" style={{ textAlign: "left", margin: "0", width: "25%", paddingLeft: "1rem" }}>Profile ID</div>
-                          </div>
-                          <div className="users-alldata">
-                            {isUserLoading
-                              ? Array(10).fill("").map((e, i) => (
-                                <div className="each-userData" key={i}>
-                                  <div className="each-user-email" style={{ width: "15%" }}><Skeleton width={100} height={25} /></div>
-                                  <div className="each-user-email"><Skeleton width={100} height={25} /></div>
-                                  <div className="each-user-email" style={{ width: "15%" }}><Skeleton width={100} height={25} /></div>
-                                  <div className="each-user-email" style={{ width: "25%" }}><Skeleton width={100} height={25} /></div>
-                                  <div className="each-user-email" style={{ width: "25%" }}><Skeleton width={200} height={25} /></div>
-                                </div>
-                              ))
-                              : crmUserData
-                                ?.filter((item) =>
-                                  item.name.toLowerCase().startsWith(search.toLowerCase()) ||
-                                  item.email.toLowerCase().startsWith(search.toLowerCase())
-                                )
-                                .map((e, i) => (
-                                  <div className="each-userData" key={i}>
-                                    <div className="each-user-email" style={{ width: "15%" }}>{e?.name}</div>
-                                    <div className="each-user-email" style={{ textTransform: "none", paddingLeft: "1rem" }}>{e?.email}</div>
-                                    <div className="each-user-email" style={{ width: "15%", paddingLeft: "1rem" }}>
-                                      {e?.naavi_timestamp ? customDateFormat(new Date(e.naavi_timestamp)) : ""}
-                                    </div>
-                                    <div className="each-user-email" style={{ width: "25%", textTransform: "none", paddingLeft: "1rem" }}>{e?.ref_affiliate}</div>
-                                    <div className="each-user-email" style={{ width: "25%", textTransform: "none", paddingLeft: "1rem" }}>{e?.naavi_profile_id}</div>
-                                  </div>
-                                ))}
-                          </div>
-                        </>
-                      ) : ""}
-                    </div>
-                  </div>
-                </>
-              ) : accsideNav === "Home" ? (
-                <>
-                  <MenuNav
-                    showDrop={showDrop}
-                    setShowDrop={setShowDrop}
-                    searchTerm={search}
-                    setSearchterm={setSearch}
-                    searchPlaceholder="Search..."
-                  />
-                  <div className="services-main" onClick={() => setShowDrop(false)}>
-                    <div style={{ padding: "35px" }}>
-                      <p style={{ color: "#617388", marginTop: "8px" }}>
-                        Welcome back, {getPartner()?.businessName || "Partner"}
-                      </p>
-                    </div>
-                  </div>
-                </>
+           ) : accsideNav === "CRM" ? (
+  <>
+    <MenuNav
+      showDrop={showDrop}
+      setShowDrop={setShowDrop}
+      searchTerm={search}
+      setSearchterm={setSearch}
+      searchPlaceholder={
+        crmMenu === "Purchases" ? "Search purchases..." : "Search clients..."
+      }
+    />
+    <CRMPage
+      showDrop={showDrop}
+      setShowDrop={setShowDrop}
+      search={search}
+      crmMenu={crmMenu}
+      setcrmMenu={setcrmMenu}
+      crmClientData={crmClientData}
+      crmPurchaseData={crmPurchaseData}
+      isClientLoading={isClientLoading}
+      isPurchaseLoading={isPurchaseLoading}
+    />
+  </>
+             ) : accsideNav === "Home" ? (
+  <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+     <PartnerHome setispopular={setispopular} />
+  </div>
               ) : accsideNav === "Marketplace" ? (
                 <>
                   <MenuNav
@@ -2382,7 +2205,7 @@ const AccDashboard = () => {
                   <div>
                     {/* <div className="acc-step-text">New</div> */}
                     <div>
-                      <div
+                      {/* <div
                         className="acc-step-box"
                         onClick={() => {
                           setselectNew("Service");
@@ -2395,7 +2218,7 @@ const AccDashboard = () => {
                         }}
                       >
                         Service
-                      </div>
+                      </div> */}
 
                       <div
                         className="acc-step-box"

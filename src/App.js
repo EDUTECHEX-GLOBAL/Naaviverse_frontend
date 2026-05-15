@@ -21,7 +21,6 @@ import UserProfile from "./pages/UserProfile";
 import Wallet from "./pages/Wallet";
 import StepPage from "./pages/CurrentStep/StepPage";
 import MallProduct from "./pages/dashboard/MallProduct/MallProduct";
-
 /* ================= ACCOUNTANT ================= */
 import AccDashboard from "./pages/accDashbaoard/accDashboard";
 import AccProfile from "./pages/accProfile/AccProfile";
@@ -37,7 +36,7 @@ import ServicesListPage from "./pages/accDashbaoard/ServicesListPage";
 import AdminLogin from "./pages/AdminLogin";
 import AdminAccDashbaoard from "./pages/AdminAccDashbaoard";
 import AdminProfilePage from "./pages/AdminAccDashbaoard/Profile/profile_page";
-
+import Subscriptions from "./pages/AdminAccDashbaoard/Subscriptions";
 /* ================= SUPER ADMIN ================= */
 import SuperAdminLogin from "./AdminDashboard/pages/SuperAdminLogin";
 import AdminDashboard from "./AdminDashboard/pages/AdminDashboard";
@@ -93,6 +92,7 @@ function App() {
           <Route path="/dashboard/users/current-step" element={<Dashboard />} />
           <Route path="/dashboard/users/transactions" element={<Dashboard />} />
           <Route path="/dashboard/users/wallet" element={<Wallet />} />
+          <Route path="/dashboard/users/home" element={<Dashboard />} />
 
           {/* ✅ MUST be before /:id wildcard so it doesn't get caught by MallProduct */}
           <Route path="/dashboard/users/Marketplace" element={<Dashboard />} />
@@ -133,7 +133,7 @@ function App() {
           <Route path="/admin/dashboard/paths" element={<AdminAccDashbaoard />} />
           <Route path="/admin/dashboard/steps" element={<AdminAccDashbaoard />} />
           <Route path="/admin/dashboard/marketplace" element={<AdminAccDashbaoard />} />
-
+          <Route path="/admin/dashboard/subscriptions" element={<AdminAccDashbaoard />} />
           {/* ================= SUPER ADMIN ================= */}
           <Route path="/admin-login" element={<SuperAdminLogin />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />}>

@@ -573,7 +573,7 @@ $pastel-mint: rgba(220, 240, 230, 0.3);
   animation: modalPopIn 0.3s ease forwards;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  overflow-y: auto;
+  overflow-y: hidden;
 
   &::before {
     content: '';
@@ -868,15 +868,6 @@ $pastel-mint: rgba(220, 240, 230, 0.3);
   background: #f5f5f5;
   transition: all 0.2s ease;
   cursor: pointer;
-
-  &:hover {
-    background: linear-gradient(135deg, #29449d, #47b4d5);
-    transform: rotate(90deg);
-
-    img {
-      filter: brightness(0) invert(1);
-    }
-  }
 
   img {
     width: 20px;
@@ -2055,10 +2046,11 @@ select {
   z-index: 1;
 }
 
+// TO THIS:
 .dashboard-sidebar {
   position: relative;
-  z-index: 1001;
-  background: transparent;
+  z-index: 500;
+  background: #ffffff;  /* White background, not transparent */
 }
 
 // Fix for CreateNewPath layout
@@ -3343,19 +3335,23 @@ body:has(.step-popup-overlay) {
 // ============================================
 // DESKTOP — enforce sidebar width
 // ============================================
+// And change the media query from width: 260px to 220px:
 @media (min-width: 769px) {
   .dashboard-sidebar {
     position: relative !important;
     left: 0 !important;
-    width: 260px !important;
+    width: 240px !important; /* Changed from 260px to 220px */
     flex-shrink: 0 !important;
     box-shadow: none !important;
+    background: #ffffff !important;  /* Force white background */
+    border-right: 1px solid #eef2f6 !important;  /* Add back the border */
   }
 
   .dashboard-screens {
-    width: calc(100vw - 260px) !important;
+   width: calc(100vw - 240px) !important; /* Match the 220px width */
     flex: 1 !important;
   }
+
 
   .mobile-topbar {
     display: none !important;

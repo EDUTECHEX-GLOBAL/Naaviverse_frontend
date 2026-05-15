@@ -12,7 +12,11 @@ const LAYER_META = {
   micro: { label: "MICRO VIEW — SUBSCRIPTIONS", sub: "Structured progress tracking.", badgeCls: "vsh-micro", cardCls: "vMicro" },
   nano: { label: "NANO VIEW — 1-ON-1 SESSIONS", sub: "Book a personalised expert session.", badgeCls: "vsh-nano", cardCls: "vNano" },
 };
-const LAYER_ICON = { macro: "📊", micro: "📚", nano: "🎓" };
+const LAYER_ICON = {
+  macro: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+  micro: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+  nano:  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 6 3 6 3s6-1 6-3v-5"/></svg>,
+};
 const TIME_SLOTS = ["10:00 AM", "12:00 PM", "2:00 PM", "4:00 PM", "6:00 PM", "8:00 PM"];
 const LAYER_PILLS = [
   { key: "all", label: "All" },
@@ -26,10 +30,10 @@ const isFreeItem = (s) => {
   const val = String(s.cost).trim().toLowerCase();
   return val === "0" || val === "free" || val === "";
 };
+
 const itemPrice = (s) => {
   if (isFreeItem(s)) return 0;
   const raw = String(s.cost).trim();
-  // Extract first number found in the string
   const match = raw.match(/[\d,]+\.?\d*/);
   if (!match) return 0;
   return parseFloat(match[0].replace(/,/g, "")) || 0;
@@ -38,15 +42,11 @@ const itemPrice = (s) => {
 const getCostDisplay = (s) => {
   if (isFreeItem(s)) return "Free";
   const raw = String(s.cost).trim();
-
-  // If it already contains letters/text (e.g. "Rs. 3,000/Subject/Month", 
-  // "Cost $250/Hour/Subject"), display it directly
   if (/[a-zA-Z$]/.test(raw)) return raw;
-
-  // Otherwise it's a plain number — format it with ₹
   const num = parseFloat(raw.replace(/[^\d.]/g, ""));
   return isNaN(num) ? raw : `₹${num.toLocaleString("en-IN")}`;
 };
+
 const fmtPrice = (n) => n === 0 ? "Free" : `₹${n.toLocaleString()}`;
 const genOrderId = () => `#NV-${Math.floor(100000 + Math.random() * 900000)}`;
 const fmtDate = (d) => d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
@@ -60,11 +60,11 @@ const ServiceCard = ({ item, inCart, onToggleCart, onCardView }) => {
     <div className={`svc-card ${meta.cardCls}`} onClick={() => onCardView && onCardView(item)}>
       <div className="svc-top">
         <div className="svc-tags">
-          {/* <span className={`svc-tag layer-tag layer-${layer}`}>{layer.charAt(0).toUpperCase()+layer.slice(1)}</span> */}
           {item.role && <span className="svc-tag role-tag">{item.role}</span>}
-          {/* {free       && <span className="svc-tag st-free">Free</span>} */}
         </div>
-        <span className="svc-ico">{LAYER_ICON[layer]}</span>
+        <span className="svc-ico" style={{ color: layer === "macro" ? "#6366f1" : layer === "micro" ? "#0d9488" : "#d97706" }}>
+  {LAYER_ICON[layer]}
+</span>
         <div className="svc-name">{item.name || "Unnamed Service"}</div>
         <div className="svc-by">by {item.partner_email || ""}</div>
         {item.goal && <div className="svc-desc">{item.goal}</div>}
@@ -78,9 +78,7 @@ const ServiceCard = ({ item, inCart, onToggleCart, onCardView }) => {
       </div>
       <div className="svc-bot">
         <div className="svc-price-wrap">
-          <div className={`svc-price ${free ? "free-price" : ""}`}>
-            {getCostDisplay(item)}
-          </div>
+          <div className={`svc-price ${free ? "free-price" : ""}`}>{getCostDisplay(item)}</div>
           <div className="svc-billing">{free ? "No cost" : (item.access || "")}</div>
         </div>
         <button
@@ -103,12 +101,25 @@ const CartDrawer = ({ cart, onRemove, onClose, onCheckout }) => {
     <div className="cart-drawer-overlay" onClick={onClose}>
       <div className="cart-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="cd-header">
-          <h2>🛒 Your Cart</h2>
+          <h2>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: 8, verticalAlign: "middle"}}>
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  Your Cart
+</h2>
           <button className="cd-close" onClick={onClose}>✕</button>
         </div>
         {cart.length === 0 ? (
           <div className="cd-empty">
-            <div className="cd-empty-icon">🛒</div>
+            <div className="cd-empty-icon">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+</div>
             <p className="cd-empty-title">Cart is empty</p>
             <p className="cd-empty-sub">Browse the marketplace to add services.</p>
           </div>
@@ -119,7 +130,9 @@ const CartDrawer = ({ cart, onRemove, onClose, onCheckout }) => {
                 const layer = s.layer?.toLowerCase() || "macro";
                 return (
                   <div className="cart-item" key={s._id}>
-                    <div className="ci-ico">{LAYER_ICON[layer]}</div>
+                  <div className="ci-ico" style={{ color: layer === "macro" ? "#6366f1" : layer === "micro" ? "#0d9488" : "#d97706" }}>
+  {LAYER_ICON[layer]}
+</div>
                     <div className="ci-inf">
                       <div className="ci-name">{s.name}</div>
                       <div className="ci-meta">
@@ -207,8 +220,6 @@ const CheckoutPage = ({ cart, onConfirm, onBack }) => {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 1000));
     const orderId = genOrderId();
-
-    // ✅ Log each purchased item individually so timeline shows every item
     const stepId = localStorage.getItem("selectedStepId") || "";
     const stepName = localStorage.getItem("selectedStepName") || "";
     const pathId = localStorage.getItem("selectedPathId") || "";
@@ -219,10 +230,7 @@ const CheckoutPage = ({ cart, onConfirm, onBack }) => {
         type: "market",
         title: `Purchased: ${item.name}`,
         desc: `Bought "${item.name}" · Order ${orderId}`,
-        pathId,
-        pathName,
-        stepId,
-        stepName,
+        pathId, pathName, stepId, stepName,
         itemName: item.name || "",
         itemCost: isFreeItem(item) ? "Free" : `₹${Number(item.cost).toLocaleString()}`,
         status: "completed",
@@ -232,7 +240,7 @@ const CheckoutPage = ({ cart, onConfirm, onBack }) => {
     onConfirm({ orderId, total, itemCount: cart.length, date: new Date() });
     setSubmitting(false);
   };
-
+  
   return (
     <div className="checkout-page">
       <div className="chk-layout">
@@ -259,7 +267,7 @@ const CheckoutPage = ({ cart, onConfirm, onBack }) => {
             <div className="pay-methods">
               {["Card", "UPI", "Net Banking"].map(m => (
                 <div key={m} className={`pay-method ${payMethod === m ? "active" : ""}`} onClick={() => setPayMethod(m)}>
-                  {m === "Card" && "💳 "}{m === "UPI" && "📱 "}{m === "Net Banking" && "🏦 "}{m}
+                  {m === "Card" && " "}{m === "UPI" && ""}{m === "Net Banking" && ""}{m}
                 </div>
               ))}
             </div>
@@ -283,8 +291,9 @@ const CheckoutPage = ({ cart, onConfirm, onBack }) => {
             <div className="os-items">
               {cart.map(s => (
                 <div className="os-row" key={s._id}>
-                  <span className="os-ico">{LAYER_ICON[s.layer?.toLowerCase() || "macro"]}</span>
-                  <span className="os-name">{s.name}</span>
+<span className="os-ico" style={{ color: s.layer === "macro" ? "#6366f1" : s.layer === "micro" ? "#0d9488" : "#d97706" }}>
+  {LAYER_ICON[s.layer?.toLowerCase() || "macro"]}
+</span>                  <span className="os-name">{s.name}</span>
                   <span className="os-price">{getCostDisplay(s)}</span>
                 </div>
               ))}
@@ -323,9 +332,29 @@ const ConfirmedPage = ({ orderInfo, onBackToJourney }) => (
 // ─── Main Component ───────────────────────────────────────────────────────────
 const UserMarketplace = ({ onStepChange }) => {
   const location = useLocation();
+
+  // ── Access flags ───────────────────────────────────────────────────────────
   const isSubscribed = location.state?.subscribed ?? false;
+  const creditUnlocked = location.state?.creditUnlocked || { micro: false, nano: false };
+  const subTier = location.state?.subTier || null;
+
+  // A user can see micro if:
+  //   • they have an active micro or nano subscription, OR
+  //   • they credit-unlocked micro on this step, OR
+  //   • they credit-unlocked nano (nano unlock implies micro access)
+  // FIXED — isSubscribed alone doesn't grant access; only credit unlocks do
+  // ✅ FIXED — subscription also grants access
+  const hasMicro = creditUnlocked.micro || isSubscribed;
+  const hasNano = creditUnlocked.nano || (isSubscribed && (subTier === "nano" || subTier === "platinum"));
+
+  // ── Component state ────────────────────────────────────────────────────────
   const [page, setPage] = useState("marketplace");
-  const [activeLayer, setActiveLayer] = useState(location.state?.defaultTab?.toLowerCase() || location.state?.view?.toLowerCase() || "all"); const [activeRole, setActiveRole] = useState("All");
+  const [activeLayer, setActiveLayer] = useState(
+    location.state?.defaultTab?.toLowerCase() ||
+    location.state?.view?.toLowerCase() ||
+    "all"
+  );
+  const [activeRole, setActiveRole] = useState("All");
   const [searchQ, setSearchQ] = useState("");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
@@ -334,13 +363,14 @@ const UserMarketplace = ({ onStepChange }) => {
   const [error, setError] = useState("");
   const [orderInfo, setOrderInfo] = useState(null);
 
-  // ── log marketplace opened once ──────────────────────────────────────────
   const marketLoggedRef = useRef(false);
 
+  // Sync active layer if location state changes
   useEffect(() => {
     if (location.state?.view) setActiveLayer(location.state.view.toLowerCase());
   }, [location.state?.view]);
 
+  // Fetch services for the current step
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true); setError("");
@@ -352,7 +382,6 @@ const UserMarketplace = ({ onStepChange }) => {
         if (res?.data?.status && Array.isArray(res.data.data)) {
           setItems(res.data.data);
 
-          // ✅ Log marketplace browse — once after items load
           if (!marketLoggedRef.current) {
             marketLoggedRef.current = true;
             const stepName = localStorage.getItem("selectedStepName") || "";
@@ -362,10 +391,7 @@ const UserMarketplace = ({ onStepChange }) => {
               type: "market",
               title: "Browsing marketplace",
               desc: `User opened Marketplace${stepName ? ` for step "${stepName}"` : ""}`,
-              pathId,
-              pathName,
-              stepId,
-              stepName,
+              pathId, pathName, stepId, stepName,
               status: "viewed",
             });
           }
@@ -382,6 +408,7 @@ const UserMarketplace = ({ onStepChange }) => {
     fetchItems();
   }, []);
 
+  // Layer item counts (for reference / future UI use)
   const layerCounts = useMemo(() => ({
     all: items.length,
     macro: items.filter(s => s.layer === "macro").length,
@@ -389,24 +416,38 @@ const UserMarketplace = ({ onStepChange }) => {
     nano: items.filter(s => s.layer === "nano").length,
   }), [items]);
 
+  // ── FIX 1: filter respects credit unlocks, not just subscription ───────────
   const filtered = useMemo(() => {
     const q = searchQ.toLowerCase();
-    return items.filter(s =>
-      (!isSubscribed ? s.layer === "macro" : true) &&
-      (activeLayer === "all" || s.layer === activeLayer) &&
-      (activeRole === "All" || s.role === activeRole) &&
-      (!q || s.name?.toLowerCase().includes(q) || s.partner_email?.toLowerCase().includes(q) || s.goal?.toLowerCase().includes(q))
-    );
-  }, [items, activeLayer, activeRole, searchQ]);
+    return items.filter(s => {
+      // Gate each layer individually
+      const layerAllowed =
+        s.layer === "macro" ? true :   // macro always free
+          s.layer === "micro" ? hasMicro :   // micro: sub OR credit unlock
+            s.layer === "nano" ? hasNano :   // nano:  sub OR credit unlock
+              true;                               // unknown layers: show
 
-  // ✅ Log when user adds item to cart
+      return (
+        layerAllowed &&
+        (activeLayer === "all" || s.layer === activeLayer) &&
+        (activeRole === "All" || s.role === activeRole) &&
+        (!q ||
+          s.name?.toLowerCase().includes(q) ||
+          s.partner_email?.toLowerCase().includes(q) ||
+          s.goal?.toLowerCase().includes(q))
+      );
+    });
+  }, [items, activeLayer, activeRole, searchQ, hasMicro, hasNano]);
+
+  // Cart helpers
   const toggleCart = (item) => {
     const alreadyIn = cart.some(s => s._id === item._id);
     setCart(prev => alreadyIn ? prev.filter(s => s._id !== item._id) : [...prev, item]);
     if (!alreadyIn) {
-      const layerLabel = item.layer === "macro" ? "Macro"
-        : item.layer === "micro" ? "Micro"
-          : item.layer === "nano" ? "Nano" : "";
+      const layerLabel =
+        item.layer === "macro" ? "Macro" :
+          item.layer === "micro" ? "Micro" :
+            item.layer === "nano" ? "Nano" : "";
       logActivity({
         type: "market",
         title: `Added to cart: ${item.name} (${layerLabel})`,
@@ -422,12 +463,12 @@ const UserMarketplace = ({ onStepChange }) => {
     }
   };
 
-  // ✅ Log when user views a service card
   const handleCardView = (item) => {
-    const layerLabel = item.layer === "macro" ? "Macro (Free Tools)"
-      : item.layer === "micro" ? "Micro (Subscriptions)"
-        : item.layer === "nano" ? "Nano (1-on-1 Sessions)"
-          : item.layer || "";
+    const layerLabel =
+      item.layer === "macro" ? "Macro (Free Tools)" :
+        item.layer === "micro" ? "Micro (Subscriptions)" :
+          item.layer === "nano" ? "Nano (1-on-1 Sessions)" :
+            item.layer || "";
     logActivity({
       type: "market",
       title: `Browsed ${layerLabel}: ${item.name}`,
@@ -447,38 +488,79 @@ const UserMarketplace = ({ onStepChange }) => {
   const handleConfirm = (info) => { setOrderInfo(info); setPage("confirmed"); setShowCart(false); };
   const currentPageKey = page === "marketplace" ? "marketplace" : page === "checkout" ? "checkout" : "confirmed";
 
+  // ── FIX 2: renderServices uses hasMicro/hasNano, not isSubscribed ──────────
   const renderServices = () => {
-    if (error) return <div className="mkt-status-box"><div style={{ fontSize: 36 }}>⚠️</div><p>{error}</p></div>;
-    if (filtered.length === 0) return <div className="mkt-status-box"><div style={{ fontSize: 36 }}>🔍</div><p>No services found for this step yet.</p></div>;
+    if (error) return (
+      <div className="mkt-status-box">
+        <div style={{ fontSize: 36 }}>⚠️</div>
+        <p>{error}</p>
+      </div>
+    );
+
+    if (filtered.length === 0) return (
+      <div className="mkt-status-box">
+        <div style={{ fontSize: 36 }}>🔍</div>
+        <p>No services found for this step yet.</p>
+      </div>
+    );
+
+    // Single-layer view (user clicked a specific pill)
     if (activeLayer !== "all") {
       const meta = LAYER_META[activeLayer];
-      return <>
-        <div className="vsh">
-          <span className={`vsh-badge ${meta.badgeCls}`}>{meta.label}</span>
-          <span className="vsh-sub">{meta.sub}</span>
-          <div className="vsh-line" />
-          <span className="vsh-cnt">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</span>
-        </div>
-        <div className="svc-grid">
-          {filtered.map(s => <ServiceCard key={s._id} item={s} inCart={inCart(s._id)} onToggleCart={toggleCart} onCardView={handleCardView} />)}
-        </div>
-      </>;
+      return (
+        <>
+          <div className="vsh">
+            <span className={`vsh-badge ${meta.badgeCls}`}>{meta.label}</span>
+            <span className="vsh-sub">{meta.sub}</span>
+            <div className="vsh-line" />
+            <span className="vsh-cnt">{filtered.length} service{filtered.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="svc-grid">
+            {filtered.map(s => (
+              <ServiceCard
+                key={s._id}
+                item={s}
+                inCart={inCart(s._id)}
+                onToggleCart={toggleCart}
+                onCardView={handleCardView}
+              />
+            ))}
+          </div>
+        </>
+      );
     }
-    return (isSubscribed ? ["macro", "micro", "nano"] : ["macro"]).map(layer => {
+
+    // "All" view — show only layers the user has access to
+    // macro is always shown; micro/nano depend on subscription or credit unlock
+    const visibleLayers = ["macro"];
+    if (hasMicro) visibleLayers.push("micro");
+    if (hasNano) visibleLayers.push("nano");
+
+    return visibleLayers.map(layer => {
       const group = filtered.filter(s => s.layer === layer);
       if (!group.length) return null;
       const meta = LAYER_META[layer];
-      return <React.Fragment key={layer}>
-        <div className="vsh">
-          <span className={`vsh-badge ${meta.badgeCls}`}>{meta.label}</span>
-          <span className="vsh-sub">{meta.sub}</span>
-          <div className="vsh-line" />
-          <span className="vsh-cnt">{group.length} service{group.length !== 1 ? "s" : ""}</span>
-        </div>
-        <div className="svc-grid">
-          {group.map(s => <ServiceCard key={s._id} item={s} inCart={inCart(s._id)} onToggleCart={toggleCart} onCardView={handleCardView} />)}
-        </div>
-      </React.Fragment>;
+      return (
+        <React.Fragment key={layer}>
+          <div className="vsh">
+            <span className={`vsh-badge ${meta.badgeCls}`}>{meta.label}</span>
+            <span className="vsh-sub">{meta.sub}</span>
+            <div className="vsh-line" />
+            <span className="vsh-cnt">{group.length} service{group.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="svc-grid">
+            {group.map(s => (
+              <ServiceCard
+                key={s._id}
+                item={s}
+                inCart={inCart(s._id)}
+                onToggleCart={toggleCart}
+                onCardView={handleCardView}
+              />
+            ))}
+          </div>
+        </React.Fragment>
+      );
     });
   };
 
@@ -497,25 +579,48 @@ const UserMarketplace = ({ onStepChange }) => {
         <div className="mkt-body">
           <div className="mkt-layout">
             <div className="mkt-main">
+
               <div className="mkt-topbar">
+                {/* Search */}
                 <div className="mkt-sw">
                   <svg className="mkt-si-icon" viewBox="0 0 20 20" fill="none">
                     <circle cx="8.5" cy="8.5" r="5.25" stroke="currentColor" strokeWidth="1.6" />
                     <path d="M13 13l3.2 3.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                   </svg>
-                  <input className="mkt-si-input" type="text" placeholder="Search services, roles, partners…" value={searchQ} onChange={e => setSearchQ(e.target.value)} />
+                  <input
+                    className="mkt-si-input"
+                    type="text"
+                    placeholder="Search services, roles, partners…"
+                    value={searchQ}
+                    onChange={e => setSearchQ(e.target.value)}
+                  />
                   {searchQ && <button className="mkt-si-clear" onClick={() => setSearchQ("")}>✕</button>}
                 </div>
+
                 <div className="mkt-div" />
+
+                {/* ── FIX 3: Layer pills — show all accessible layers, not just the active one */}
                 <div className="vpills">
-                  {LAYER_PILLS.filter(({ key }) => key === activeLayer).map(({ key, label, emoji }) => (
-                    <button key={key} className={`vpill vpill--${key} ${activeLayer === key ? "active" : ""}`} onClick={() => setActiveLayer(key)}>
-                      {emoji && <span className="vpill-emoji">{emoji}</span>}
+                  {LAYER_PILLS.filter(({ key }) => {
+                    if (key === "all") return true;          // always show "All"
+                    if (key === "macro") return true;          // macro always free
+                    if (key === "micro") return hasMicro;      // micro: sub or credit unlock
+                    if (key === "nano") return hasNano;       // nano:  sub or credit unlock
+                    return false;
+                  }).map(({ key, label }) => (
+                    <button
+                      key={key}
+                      className={`vpill vpill--${key} ${activeLayer === key ? "active" : ""}`}
+                      onClick={() => setActiveLayer(key)}
+                    >
                       <span className="vpill-label">{label}</span>
                     </button>
                   ))}
                 </div>
+
                 <div className="mkt-div" />
+
+                {/* Cart button */}
                 <button className="cart-top-btn" onClick={() => setShowCart(true)}>
                   <svg className="cart-icon" viewBox="0 0 24 24" fill="none">
                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
@@ -526,9 +631,14 @@ const UserMarketplace = ({ onStepChange }) => {
                   {cart.length > 0 && <span className="cart-top-badge">{cart.length}</span>}
                 </button>
               </div>
+
               <div className="services-container">
-                {loading ? <div className="mkt-loading"><div className="mkt-spinner" /><p>Loading services…</p></div> : renderServices()}
+                {loading
+                  ? <div className="mkt-loading"><div className="mkt-spinner" /><p>Loading services…</p></div>
+                  : renderServices()
+                }
               </div>
+
             </div>
           </div>
         </div>

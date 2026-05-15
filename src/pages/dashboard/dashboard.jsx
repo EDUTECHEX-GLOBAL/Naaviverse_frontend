@@ -32,24 +32,24 @@ import { useCoinContextData } from "../../context/CoinContext";
 import axios from "axios";
 import VaultTransactions from "../VaultTransactions/index.jsx";
 import TransactionPage from "./TransactionPage/index.jsx";
-// REMOVED: import MenuNav from "../../components/MenuNav/index.jsx";
-
-// ✅ NEW: Import the new Marketplace component
+import UserHome from "./userHome.jsx"; 
 import UserMarketplace from "../UserMarketplace.jsx";
 
-// ✅ URL → sideNav mapping (longest paths first to avoid prefix collisions)
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const URL_TO_SIDENAV = {
-  "/dashboard/users/Marketplace":  "Market Place",
+  "/dashboard/users/home": "Home",
+  "/dashboard/users/Marketplace": "Market Place",
   "/dashboard/users/current-step": "Current Step",
-  "/dashboard/users/my-journey":   "My Journey",
-  "/dashboard/users/transactions":  "Transactions",
-  "/dashboard/users/paths":        "Paths",
-  "/dashboard/users":              "Paths",
+  "/dashboard/users/my-journey": "My Journey",
+  "/dashboard/users/transactions": "Transactions",
+  "/dashboard/users/paths": "Paths",
+  "/dashboard/users": "Home",
 };
 
 const Dashboard = () => {
-  // ✅ useLocation — reacts to EVERY navigation, not just mount
   const location = useLocation();
+  const navigate = useNavigate();
 
   const {
     sideNav,
@@ -100,11 +100,65 @@ const Dashboard = () => {
   const [productKeys, setProductKeys] = useState(null);
   const [profileId, setProfileId] = useState("");
   const [productDataArray, setProductDataArray] = useState([]);
+  
+  // ✅ ADDED: Access control states
+  const [approvalStatus, setApprovalStatus] = useState("");
+ const [isProfileIncomplete, setIsProfileIncomplete] = useState(null); 
 
   const userDetails = JSON.parse(localStorage.getItem("user"));
-  const navigate = useNavigate();
 
-  // ✅ Derive correct page from URL SYNCHRONOUSLY on every render — no flash of stale sideNav
+  // ✅ ADDED: Function to check user access (profile completion + approval)
+  const checkUserAccess = async () => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const email = parsed?.user?.email || parsed?.email;
+      if (!email) return;
+
+      // Check profile completion
+      const profileRes = await axios.get(`${BASE_URL}/api/users/get/${email}`);
+      const data = profileRes.data?.data;
+
+      const isComplete =
+        data?.isProfileCompleted === true ||
+        (data?.name && data?.username && data?.phoneNumber &&
+         data?.school && data?.personality);
+
+      if (!isComplete) {
+        setIsProfileIncomplete(true);
+        setApprovalStatus("");
+        // Redirect to profile page
+        navigate("/dashboard/users/profile");
+        return;
+      }
+
+      setIsProfileIncomplete(false);
+
+      // Check approval status
+      const cached = parsed?.approvalStatus;
+      if (cached === "approved") {
+        setApprovalStatus("approved");
+        return;
+      }
+
+      const approvalRes = await axios.get(
+        `${BASE_URL}/api/approvals/status?email=${email}&role=User`
+      );
+      const status = approvalRes.data?.data?.status;
+      setApprovalStatus(status || "pending");
+
+      // Update localStorage
+      const updated = { ...parsed, approvalStatus: status || "pending" };
+      localStorage.setItem("user", JSON.stringify(updated));
+
+    } catch (err) {
+      console.error("Access check failed:", err);
+      setIsProfileIncomplete(false);
+    }
+  };
+
+  // ✅ Derive correct page from URL SYNCHRONOUSLY on every render
   const activePage = (() => {
     const currentPath = location.pathname;
     const matchedKey = Object.keys(URL_TO_SIDENAV)
@@ -148,11 +202,13 @@ const Dashboard = () => {
     fetchData();
   }, [productKeys]);
 
-  // ── Auth + follow ────────────────────────────────────────────────────────
+  // ── Auth + follow + access check ────────────────────────────────────────
+  // ✅ REPLACED: Added checkUserAccess() call
   useEffect(() => {
     const userDetails = JSON.parse(localStorage.getItem("user"));
     if (!userDetails) navigate("/login");
     handleFollowList();
+    checkUserAccess(); // 👈 ADDED: Check profile and approval status
   }, []);
 
   const handleFollowList = () => {
@@ -235,117 +291,197 @@ const Dashboard = () => {
       <div className="dashboard-main">
         <div className="dashboard-body">
           <div onClick={() => setShowDrop(false)}>
-            <Dashsidebar />
+            {/* ✅ FIXED: Pass props to Dashsidebar */}
+            <Dashsidebar
+  approvalStatus={approvalStatus}
+  isProfileIncomplete={isProfileIncomplete === true} // only true when CONFIRMED incomplete, not during loading
+/>
           </div>
 
           <div className="dashboard-screens">
             <div style={{ height: "100%" }}>
 
-              {/* ✅ Market Place — full height, no navigation */}
-              {activePage === "Market Place" ? (
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                  <UserMarketplace
-                    onStepChange={(view) => {
-                      if (view === "currentStep") { setsideNav("Current Step"); navigate("/dashboard/users/current-step"); }
-                      else if (view === "myJourney") { setsideNav("My Journey"); navigate("/dashboard/users/my-journey"); }
-                    }}
-                  />
-                </div>
+{activePage === "Home" ? (
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <UserHome />
+  </div>
 
-              ) : activePage === "Paths" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                  <PathComponent />
-                </div>
+) : activePage === "Market Place" ? (
 
-              ) : activePage === "My Journey" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                  <JourneyPage />
-                </div>
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <UserMarketplace
+      onStepChange={(view) => {
+        if (view === "currentStep") {
+          setsideNav("Current Step");
+          navigate("/dashboard/users/current-step");
+        } else if (view === "myJourney") {
+          setsideNav("My Journey");
+          navigate("/dashboard/users/my-journey");
+        }
+      }}
+    />
+  </div>
 
-              ) : activePage === "Current Step" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                  <CurrentStep productDataArray={productDataArray} />
-                </div>
+) : activePage === "Paths" ? (
 
-              ) : activePage === "Transactions" ? (
-                <TransactionPage
-                  showDrop={showDrop}
-                  setShowDrop={setShowDrop}
-                  search={search}
-                  setSearch={setSearch}
-                  searchic={searchic}
-                  profile={profile}
-                  downarrow={downarrow}
-                />
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <PathComponent />
+  </div>
 
-              ) : activePage === "Partners" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="account-container" onClick={() => setShowDrop(false)}>
-                  <div className="account-left" style={{ paddingBottom: "0" }}>
-                    <div className="all-account">
-                      {accountantsList?.data
-                        ?.filter((e) => e.displayName.toLowerCase().startsWith(search.toLowerCase()))
-                        ?.map((each, i) => (
-                          <div className="each-account" key={i}>
-                            <div className="account-img-box"><img className="account-img" src={each?.profilePicURL} alt="" /></div>
-                            <div className="account-name">{each?.displayName}</div>
-                            <div className="account-work">{each?.description}</div>
-                            <div className="account-see-more" onClick={() => { if (!each?.userFollow) { handleFollowBrand(each); setChoice("Follow"); } else { handleUnFollowBrand(each); setChoice("Unfollow"); } }} style={{ background: each?.userFollow ? "#FE2C55" : "#59A2DD" }}>
-                              {each?.userFollow ? "Unfollow" : "Follow"}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
+) : activePage === "My Journey" ? (
 
-              ) : activePage === "Calendar" ? (
-                // REMOVED: <MenuNav /> component
-                <div onClick={() => setShowDrop(false)}><EarningCalendar /></div>
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <JourneyPage />
+  </div>
 
-              ) : activePage === "Wallet" ? (
-                transactionSelected ? (
-                  // REMOVED: <MenuNav /> component
-                  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                    <div className="services-all-menu" style={{ borderBottom: "0.5px solid #E5E5E5" }}>
-                      <div style={{ display: "flex", width: "calc(100% - 110px)" }}>
-                        <div className="services-each-menu" style={{ background: coinType === "fiat" ? "rgba(241,241,241,0.5)" : "", fontWeight: coinType === "fiat" ? "700" : "" }} onClick={() => { setCoinType("fiat"); setSearch(""); }}>Forex</div>
-                      </div>
-                      <div style={{ fontWeight: "600", textDecorationLine: "underline", cursor: "pointer", fontSize: "0.9rem" }} onClick={() => { setTransactionSelected(false); setTransactionData([]); setSelectedCoin({}); }}>Back</div>
-                    </div>
-                    <VaultTransactions />
-                  </div>
-                ) : (
-                  // REMOVED: <MenuNav /> component
-                  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
-                    <div className="services-all-menu" style={{ borderBottom: "0.5px solid #E5E5E5" }}>
-                      <div style={{ display: "flex", width: "83%" }}>
-                        <div className="services-each-menu" style={{ background: coinType === "fiat" ? "rgba(241,241,241,0.5)" : "", fontWeight: coinType === "fiat" ? "700" : "" }} onClick={() => { setCoinType("fiat"); setSearch(""); }}>Forex</div>
-                      </div>
-                      <div style={{ display: "flex" }}><Toggle toggle={balanceToggle} setToggle={setBalanceToggle} coinType={coinType} /></div>
-                    </div>
-                    <Vaults searchedValue={searchVault} />
-                  </div>
-                )
+) : activePage === "Current Step" ? (
 
-              ) : activePage === "Task Manager" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}><Tasks /></div>
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <CurrentStep productDataArray={productDataArray} />
+  </div>
 
-              ) : activePage === "Scanner" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}><WalletScan /></div>
+) : activePage === "Transactions" ? (
 
-              ) : activePage === "Universities" ? (
-                // REMOVED: <MenuNav /> component
-                <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}><Directory /></div>
+  <TransactionPage
+    showDrop={showDrop}
+    setShowDrop={setShowDrop}
+    search={search}
+    setSearch={setSearch}
+    searchic={searchic}
+    profile={profile}
+    downarrow={downarrow}
+  />
 
-              ) : (
-                ""
-              )}
+) : activePage === "Partners" ? (
+
+  <div className="account-container" onClick={() => setShowDrop(false)}>
+    <div className="account-left" style={{ paddingBottom: "0" }}>
+      <div className="all-account">
+        {accountantsList?.data
+          ?.filter((e) =>
+            e.displayName.toLowerCase().startsWith(search.toLowerCase())
+          )
+          ?.map((each, i) => (
+            <div className="each-account" key={i}>
+              <div className="account-img-box">
+                <img className="account-img" src={each?.profilePicURL} alt="" />
+              </div>
+              <div className="account-name">{each?.displayName}</div>
+              <div className="account-work">{each?.description}</div>
+              <div
+                className="account-see-more"
+                onClick={() => {
+                  if (!each?.userFollow) {
+                    handleFollowBrand(each);
+                    setChoice("Follow");
+                  } else {
+                    handleUnFollowBrand(each);
+                    setChoice("Unfollow");
+                  }
+                }}
+                style={{
+                  background: each?.userFollow ? "#FE2C55" : "#59A2DD",
+                }}
+              >
+                {each?.userFollow ? "Unfollow" : "Follow"}
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  </div>
+
+) : activePage === "Calendar" ? (
+
+  <div onClick={() => setShowDrop(false)}>
+    <EarningCalendar />
+  </div>
+
+) : activePage === "Wallet" ? (
+
+  transactionSelected ? (
+    <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+      <div className="services-all-menu" style={{ borderBottom: "0.5px solid #E5E5E5" }}>
+        <div style={{ display: "flex", width: "calc(100% - 110px)" }}>
+          <div
+            className="services-each-menu"
+            style={{
+              background: coinType === "fiat" ? "rgba(241,241,241,0.5)" : "",
+              fontWeight: coinType === "fiat" ? "700" : "",
+            }}
+            onClick={() => {
+              setCoinType("fiat");
+              setSearch("");
+            }}
+          >
+            Forex
+          </div>
+        </div>
+        <div
+          style={{
+            fontWeight: "600",
+            textDecorationLine: "underline",
+            cursor: "pointer",
+            fontSize: "0.9rem",
+          }}
+          onClick={() => {
+            setTransactionSelected(false);
+            setTransactionData([]);
+            setSelectedCoin({});
+          }}
+        >
+          Back
+        </div>
+      </div>
+      <VaultTransactions />
+    </div>
+  ) : (
+    <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+      <div className="services-all-menu" style={{ borderBottom: "0.5px solid #E5E5E5" }}>
+        <div style={{ display: "flex", width: "83%" }}>
+          <div
+            className="services-each-menu"
+            style={{
+              background: coinType === "fiat" ? "rgba(241,241,241,0.5)" : "",
+              fontWeight: coinType === "fiat" ? "700" : "",
+            }}
+            onClick={() => {
+              setCoinType("fiat");
+              setSearch("");
+            }}
+          >
+            Forex
+          </div>
+        </div>
+        <div style={{ display: "flex" }}>
+          <Toggle toggle={balanceToggle} setToggle={setBalanceToggle} coinType={coinType} />
+        </div>
+      </div>
+      <Vaults searchedValue={searchVault} />
+    </div>
+  )
+
+) : activePage === "Task Manager" ? (
+
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <Tasks />
+  </div>
+
+) : activePage === "Scanner" ? (
+
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <WalletScan />
+  </div>
+
+) : activePage === "Universities" ? (
+
+  <div className="services-main" style={{ height: "100%" }} onClick={() => setShowDrop(false)}>
+    <Directory />
+  </div>
+
+) : (
+  ""
+)}
 
             </div>
           </div>
@@ -505,4 +641,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard; 

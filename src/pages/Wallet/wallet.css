@@ -13,8 +13,8 @@
   z-index: 1;
 }
 .wallet-page-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   color: #1a1a2e;
 }
 .wallet-container {
@@ -81,7 +81,7 @@
   opacity: 1; margin-bottom: 10px; color: #0d9488; font-weight: 700;
 }
 .wallet-balance-amount {
-  font-size: 42px; font-weight: 800; letter-spacing: -1.5px;
+  font-size: 27px; font-weight: 500; letter-spacing: -1.5px;
   line-height: 1; color: #0f1f3d;
 }
 .wallet-balance-unit {
@@ -123,9 +123,9 @@
   flex-shrink: 0; font-size: 14px; font-weight: 700;
 }
 .wallet-tx-info { flex: 1; }
-.wallet-tx-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+.wallet-tx-name { font-size: 13px; font-weight: 500; color: #1a1a2e; }
 .wallet-tx-date { font-size: 11px; color: #bbb; margin-top: 2px; }
-.wallet-tx-amount { font-size: 14px; font-weight: 700; }
+.wallet-tx-amount { font-size: 14px; font-weight: 600; }
 
 /* Empty / info */
 .wallet-empty-state {
@@ -200,4 +200,123 @@
 .services-main {
   overflow-y: auto !important;
   overflow-x: hidden !important;
+}
+
+/* ── ADD THESE AT THE BOTTOM OF YOUR EXISTING wallet.css ── */
+
+/* Welcome banner expiry line */
+.wallet-welcome-expiry {
+  font-size: 12px;
+  color: #856404;
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+
+.wallet-expired-banner {
+  font-size: 12px;
+  color: #856404;
+  font-weight: 500;
+  margin-bottom: 10px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+/* Balance card sub-text warning state */
+.wallet-balance-sub--warning {
+  color: #b45309 !important;
+  font-weight: 600;
+}
+
+/* Expiry pill on transaction row */
+.wallet-tx-expiry-pill {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #e8f4fd;
+  color: #185FA5;
+  vertical-align: middle;
+  letter-spacing: 0.2px;
+}
+.wallet-tx-expiry-pill.warn {
+  background: #fff3cd;
+  color: #856404;
+}
+.wallet-tx-expiry-pill.expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Expired transaction row — dim it */
+.wallet-tx-row--expired {
+  background: #fafafa;
+}
+.wallet-tx-row--expired:hover {
+  background: #f5f5f5;
+}
+
+/* Small "expired" tag below the amount */
+.wallet-tx-expired-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #bbb;
+  text-align: right;
+  margin-top: 2px;
+}
+
+/* ── Credit breakdown chips ──────────────────────────── */
+.wallet-credit-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.wallet-credit-row {
+  display: flex;
+  align-items: center;
+}
+
+.wallet-credit-chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.wallet-credit-chip--permanent {
+  background: #eaf3de;
+  color: #3B6D11;
+}
+
+.wallet-credit-chip--bonus {
+  background: #e8eeff;
+  color: #185FA5;
+}
+
+.wallet-credit-chip--bonus.warn {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.wallet-credit-chip--expired {
+  background: #fff0f0;
+  color: #999;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  border: 1px solid #f5c6cb;
+}
+
+/* ── Never expires badge on txn rows ─────────────────── */
+.wallet-tx-expiry-pill.permanent {
+  background: #eaf3de;
+  color: #3B6D11;
+  border: none;
 }
