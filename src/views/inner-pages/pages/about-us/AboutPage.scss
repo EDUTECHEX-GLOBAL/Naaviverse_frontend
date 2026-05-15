@@ -38,9 +38,14 @@ $border:   rgba(0,0,0,0.07);
   padding: 96px 0;
   @media(max-width:768px) { padding: 64px 0; }
 }
-.ab-alt-white { background: $white; }
-.ab-alt-soft  { background: $soft2; }
-
+.ab-alt-white { 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+.ab-alt-soft  { 
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
 // two-col layout
 .ab-row {
   display: grid;
@@ -416,7 +421,8 @@ h5 { font-size: 14px; font-weight: 600; color: $navy; margin-bottom: 10px; }
   @media(max-width:900px) { grid-template-columns: 1fr; }
 }
 .ab-tech-card {
-  background: $white; border-radius: 16px; padding: 28px 22px;
+   background: rgba(255,255,255,0.15);  // Semi-transparent instead of solid white
+  backdrop-filter: blur(10px);
   border: 1px solid $border; border-left: 4px solid var(--tc);
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   transition: transform .2s ease;
@@ -562,3 +568,23 @@ h5 { font-size: 14px; font-weight: 600; color: $navy; margin-bottom: 10px; }
   padding: 7px 16px; border-radius: 100px;
   font-size: 12px; font-weight: 500;
 }     
+
+.ab-alt-white, .ab-alt-soft {
+  h2, .ab-lead, p, .ab-green {
+    color: white;
+  }
+  
+  .ab-lead {
+    color: rgba(255,255,255,0.9);
+  }
+  
+  p {
+    color: rgba(255,255,255,0.85);
+  }
+  
+  .ab-pill {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+  }
+}
